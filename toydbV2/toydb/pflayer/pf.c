@@ -11,6 +11,8 @@
 #define L_SET 0
 #endif
 
+int PFdiskreadcount = 0;
+int PFdiskwritecount = 0;
 int PFerrno = PFE_OK;	/* last error message */
 
 static PFftab_ele PFftab[PF_FTAB_SIZE]; /* table of opened files */
@@ -106,7 +108,7 @@ RETURN VALUE:
 *****************************************************************************/
 {
 int error;
-
+	PFdiskreadcount++;
 	/* seek to the appropriate place */
 	if ((error=lseek(PFftab[fd].unixfd,pagenum*sizeof(PFfpage)+PF_HDR_SIZE,
 				L_SET)) == -1){
@@ -144,7 +146,7 @@ RETURN VALUE:
 *****************************************************************************/
 {
 int error;
-
+PFdiskwritecount++;
 	/* seek to the right place */
 	if ((error=lseek(PFftab[fd].unixfd,pagenum*sizeof(PFfpage)+PF_HDR_SIZE,
 				L_SET)) == -1){
@@ -167,6 +169,11 @@ int error;
 
 
 /************************* Interface Routines ****************************/
+
+void setBufMode(int val)
+{
+	PFsetbufmode(val);
+}
 
 void PF_Init()
 /****************************************************************************
@@ -745,4 +752,8 @@ RETURN VALUE: none
 		perror(" ");
 	else	fprintf(stderr,"\n");
 
+}
+void PF_printcounts()
+{
+	printf("read %d write %d", PFdiskreadcount, PFdiskwritecount);
 }

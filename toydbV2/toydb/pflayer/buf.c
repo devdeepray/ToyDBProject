@@ -10,13 +10,16 @@ static PFbpage *PFfirstbpage= NULL;	/* ptr to first buffer page, or NULL */
 static PFbpage *PFlastbpage = NULL;	/* ptr to last buffer page, or NULL */
 static PFbpage *PFfreebpage= NULL;	/* list of free buffer pages */
 static int PFbufmode = 0; /* 0: MRU 1: LRU */
-static int PFbufdiskread = 0;
-static int PFbufdiskwrite = 0;
-static int PFbufhitcount = 0;
-static int PFbufmisscount = 0;
-static int PFbufdelete = 0;
-static int PFbufinsert = 0;
+
 extern char *malloc();
+
+
+PFsetbufmode(int modeval)
+{
+	PFbufmode = modeval;
+}
+
+
 
 static void PFbufInsertFree(bpage)
 PFbpage *bpage;
@@ -27,6 +30,7 @@ SPECIFICATIONS:
 AUTHOR: clc
 *****************************************************************************/
 {
+	bpage->freqCount = 0;
 	bpage->nextpage = PFfreebpage;
 	PFfreebpage = bpage;
 }
@@ -118,6 +122,38 @@ static PFbufgetvictimLRU()
 	return tbpage;
 }
 
+static PFbufgetvictimLFU()
+{
+	PFbpage* tbpage = NULL;
+	PFbpage* mincountpage = NULL;
+	for (tbpage=PFfirstbpage;tbpage!=NULL;tbpage=tbpage->nextpage){
+		if (!tbpage->fixed)
+		{
+			if(!mincountpage || tbpage->freqCount < mincountpage->freqCount)
+			{
+				mincountpage = tbpage;
+			}
+		}
+	}
+	return mincountpage;
+}
+
+static PFbufgetvictimMFU()
+{
+	PFbpage* tbpage = NULL;
+	PFbpage* maxcountpage = NULL;
+	for (tbpage=PFfirstbpage;tbpage!=NULL;tbpage=tbpage->nextpage){
+		if (!tbpage->fixed)
+		{
+			if(!maxcountpage || tbpage->freqCount > maxcountpage->freqCount)
+			{
+				maxcountpage = tbpage;
+			}
+		}
+	}
+	return maxcountpage;
+}
+
 static PFbufInternalAlloc(bpage,writefcn)
 PFbpage **bpage;	/* pointer to pointer to buffer bpage to be allocated*/
 int (*writefcn)();
@@ -168,6 +204,7 @@ int error;		/* error value returned*/
 			PFerrno = PFE_NOMEM;
 			return(PFerrno);
 		}
+		(*bpage)->freqCount = 0;
 		/* increment # of pages allocated */
 		PFnumbpage++;
 	}
@@ -186,6 +223,14 @@ int error;		/* error value returned*/
 		    // LRU
 		    tbpage = PFbufgetvictimLRU();
 		    break;
+		  case 2:
+			// MFU
+			tbpage = PFbufgetvictimMFU();
+			break;
+		  case 3:
+			// LFU
+			tbpage = PFbufgetvictimLFU();
+			break;
 		  default:
 		    tbpage = NULL;
 		    break;
@@ -204,13 +249,11 @@ int error;		/* error value returned*/
 		if (tbpage->dirty&&((error=(*writefcn)(tbpage->fd,
 				tbpage->page,&tbpage->fpage))!= PFE_OK))
 			return(error);
-		if(tbpage->dirty) PFbufdiskwrite++;
 		tbpage->dirty = FALSE;
 
 		/* unlink from hash table */
 		if ((error=PFhashDelete(tbpage->fd,tbpage->page))!= PFE_OK)
 			return(error);
-		PFbufdelete++;
 		/* unlink from buffer list */
 		PFbufUnlink(tbpage);
 
@@ -220,7 +263,6 @@ int error;		/* error value returned*/
 	}
 
 	/* Link the page as the head of the used list */
-	PFbufinsert++;
 	PFbufLinkHead(*bpage);
 	return(PFE_OK);
 }
@@ -278,8 +320,6 @@ int error;
 		/******************************************************/
 		// Increment disk read, whether it was erroneous or not
 		
-		PFbufdiskread++;
-		PFbufmisscount++;
 		
 		/* read the page */
 		if ((error=(*readfcn)(fd,pagenum,&bpage->fpage))!= PFE_OK){
@@ -454,7 +494,6 @@ int error;		/* error code */
 				return(PFerrno);
 			}
 
-			if(bpage->dirty) PFbufdiskwrite++;
 			
 			/* write out dirty page */
 			if (bpage->dirty&&((error=(*writefcn)(fd,bpage->page,
@@ -515,7 +554,7 @@ RETURN VALUE: PF error codes.
 		return(PFerrno);
 	}
 	
-	PFbufhitcount++;
+	
 
 	/* mark this page dirty */
 	bpage->dirty = TRUE;
@@ -538,8 +577,7 @@ AUTHOR: clc
 {
 PFbpage *bpage;
 
-	printf("PFbufdiskread %d PFbufdiskwrite %d\n", PFbufdiskread, PFbufdiskwrite);
-	printf("PFbufhitcount %d PFbufmisscount %d\n", PFbufhitcount, PFbufmisscount);
+
 
 	printf("buffer content:\n");
 	if (PFfirstbpage == NULL)
@@ -551,4 +589,9 @@ PFbpage *bpage;
 				bpage->fd,bpage->page,(int)bpage->fixed,
 				(int)bpage->dirty,(int)&bpage->fpage);
 	}
+}
+
+PFbufAccessed(PFbpage* bfpage)
+{
+	bfpage->freqCount++;
 }

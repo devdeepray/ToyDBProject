@@ -8,6 +8,9 @@
 
 main()
 {
+int bufmode;
+scanf("%d", &bufmode);
+setBufMode(bufmode);
 int error;
 int i;
 int pagenum,*buf;
@@ -289,7 +292,7 @@ int fd1,fd2;
 	/* print the buffer */
 	printf("buffer:\n");
 	PFbufPrint();
-
+	PF_printcounts();
 	/* print the hash table */
 	printf("hash table:\n");
 	PFhashPrint();

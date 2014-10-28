@@ -47,6 +47,7 @@ typedef struct PFbpage {
 	int	page;			/* page number of this page */
 	int	fd;			/* file desciptor of this page */
 	PFfpage fpage; /* page data from the file */
+	int freqCount;
 } PFbpage;
 
 
@@ -78,3 +79,5 @@ extern PFbufGet();
 extern PFbufUnfix();
 extern PFbufalloc();
 extern PFbufReleaseFile();
+extern PFsetbufmode(int);
+extern PFbufAccessed();

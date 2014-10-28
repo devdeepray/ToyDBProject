@@ -38,6 +38,7 @@
 extern int PFerrno;		/* error number of last error */
 extern void PF_Init();
 extern void PF_PrintError();
+extern void PF_printcounts();
 
 int PF_CreateFile(char *fname);
 
@@ -58,3 +59,5 @@ int PF_DisposePage(int fd, int pagenum);
 int PF_UnfixPage(int fd, int pagenum, int dirty);
 
 void PF_PrintError(char *s);
+
+void setBufMode(int n);
