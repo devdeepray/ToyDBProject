@@ -9,10 +9,13 @@ pflayer.o: $(OBJ)
 tests: testhash testpf
 
 testpf: testpf.o pflayer.o
-	cc -o testpf testpf.o pflayer.o
+	g++ -o testpf testpf.o pflayer.o
+
+createtable: createtable.o pflayer.o
+	g++ -o createtable createtable.o pflayer.o
 
 testhash: testhash.o pflayer.o
-	cc -o testhash testhash.o pflayer.o
+	g++ -o testhash testhash.o pflayer.o
 
 $(OBJ): $(HDR)
 
