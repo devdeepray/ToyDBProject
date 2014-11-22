@@ -108,6 +108,8 @@ static PFbufgetvictimMRU()
 		/* found a page that can be swapped out */
 		break;
 	}
+	printf("av");
+	printf("%d", tbpage);
 	return tbpage;
 }
 
@@ -216,7 +218,7 @@ int error;		/* error value returned*/
 		switch(PFbufmode)
 		{
 		  case 0:
-		    // MRU
+			// MRU
 		    tbpage = PFbufgetvictimMRU();
 		    break;
 		  case 1:
@@ -237,29 +239,36 @@ int error;		/* error value returned*/
 		}
 		*bpage = NULL;		/* set initial return value */
 
-		
-
 		if (tbpage == NULL){
 			/* couldn't find a free page */
 			PFerrno = PFE_NOBUF;
 			return(PFerrno);
 		}
+		
+		printf("some0\n");
+		printf("%d\n", tbpage);
+
+		printf("%d\n", tbpage->dirty);
+				printf("%d\n", tbpage);
+
+						printf("%d\n", tbpage);
 
 		/* write out the dirty page */
-		if (tbpage->dirty&&((error=(*writefcn)(tbpage->fd,
-				tbpage->page,&tbpage->fpage))!= PFE_OK))
+		if (tbpage->dirty&&((error=(*writefcn)(tbpage->fd, tbpage->page,&tbpage->fpage))!= PFE_OK)) {
+			printf("some1\n");
 			return(error);
+		}
+		printf("some4\n");
+
 		tbpage->dirty = FALSE;
 
 		/* unlink from hash table */
-		if ((error=PFhashDelete(tbpage->fd,tbpage->page))!= PFE_OK)
+		if ((error=PFhashDelete(tbpage->fd,tbpage->page))!= PFE_OK) {
 			return(error);
+		}
 		/* unlink from buffer list */
 		PFbufUnlink(tbpage);
-
 		*bpage = tbpage;
-		
-
 	}
 
 	/* Link the page as the head of the used list */
@@ -304,19 +313,27 @@ RETURN VALUE:
 GLOBAL VARIABLES MODIFIED:
 *****************************************************************************/
 {
+	printf("PFBuFGet\n");
+
 PFbpage *bpage;	/* pointer to buffer */
 int error;
 
 	if ((bpage=PFhashFind(fd,pagenum)) == NULL){
 		/* page not in buffer. */
+		printf("rand\n");
+
 		
 		/* allocate an empty page */
 		if ((error=PFbufInternalAlloc(&bpage,writefcn))!= PFE_OK){
+		printf("rand\n");
+
 			/* error */
 			*fpage = NULL;
 			return(error);
 		}
 		
+		printf("rand\n");
+
 		/******************************************************/
 		// Increment disk read, whether it was erroneous or not
 		
@@ -331,6 +348,7 @@ int error;
 			return(error);
 		}
 		
+		printf("rand\n");
 
 		/* insert new page into hash table */
 		if ((error=PFhashInsert(fd,pagenum,bpage))!=PFE_OK){

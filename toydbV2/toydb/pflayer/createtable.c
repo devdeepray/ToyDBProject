@@ -57,27 +57,46 @@ int fd1,fd2;
 
     printf("1: Create table 2: select from table 3: join two tables\n");
     int choice;
-    char filename[20];
     scanf("%d", &choice);
-    printf("Enter file name\n");
-    scanf("%s", filename);
+
+	char filename1[20], filename2[20];
 
     switch(choice)
     {
     case 1:
-        if ((error=PF_CreateFile(filename))!= PFE_OK){
+		printf("Enter file name\n");
+    	scanf("%s", filename1);
+
+        if ((error=PF_CreateFile(filename1))!= PFE_OK){
             PF_PrintError("asfsad");
             exit(1);
         }
+
         printf("Enter number of pages\n");
         scanf("%d", &choice);
-        writefile(filename, choice);
+        writefile(filename1, choice);
+
         break;
+
     case 2:
-        selectByName(filename, "DBInternals");
+		printf("Enter file name\n");
+    	scanf("%s", filename1);
+
+        selectByName(filename1, "DBInternals");
+
         break;
+
     case 3:
+		printf("Enter first file\n");
+    	scanf("%s", filename1);
+
+		printf("Enter second file\n");
+    	scanf("%s", filename2);
+
+		join(filename1, filename2);
+
         break;
+
     default:
         break;
     }
@@ -195,6 +214,78 @@ selectByName(char* fname, char* name)
 
 }
 
+join(char *f1, char *f2) {
+    int page_hdr1 = 4, page_hdr2 = 4;
+    
+	int fd1, pagenum1, *buf1, error1, fd2, pagenum2, *buf2, error2;
+
+	printf("opening %s\n", f1);
+
+    if ((fd1=PF_OpenFile(f1))<0){
+		PF_PrintError("open file");
+		exit(1);
+	}
+
+	printf("opening %s\n", f2);
+
+	if ((fd2=PF_OpenFile(f2))<0) {
+		PF_PrintError("open file");
+		exit(1);
+	}
+
+	pagenum1 = -1;
+
+	while ((error1=PF_GetNextPage(fd1,&pagenum1,&buf1))== PFE_OK) {
+		pagenum2 = -1;
+
+		while ((error2=PF_GetNextPage(fd2,&pagenum2,&buf2))== PFE_OK) {
+			printf("%d\n", pagenum2);
+
+			struct Record r1;
+			struct Record r2;
+			int n_tuppp1 = buf1[0], n_tuppp2 = buf2[0], i1 = 0, i2 = 0;
+
+			printf("a\n");
+
+			for(; i1 < n_tuppp1; ++ i1) {
+				i2 = 0;
+
+				for(; i2 < n_tuppp2; ++ i2) {
+					readRecord(&r1, page_hdr1 + i1 * sizeof(r1), sizeof(r1), buf1);
+					readRecord(&r2, page_hdr2 + i2 * sizeof(r2), sizeof(r2), buf2);
+
+					// Can implement join condition and print output to stdout/file here. Will not affect buffer performance analysis.
+				}
+			}
+
+			printf("b\n");
+
+			if ((error2=PF_UnfixPage(fd2,pagenum2,FALSE))!= PFE_OK) {
+				PF_PrintError("unfix");
+				exit(1);
+			}
+
+			printf("c\n");
+		}
+
+		printf("e\n");
+
+		if ((error1=PF_UnfixPage(fd1,pagenum1,FALSE))!= PFE_OK) {
+			PF_PrintError("unfix");
+			exit(1);
+		}
+	}
+
+	if ((error2=PF_CloseFile(fd2))!= PFE_OK){
+		PF_PrintError("close file");
+		exit(1);
+	}
+
+	if ((error1=PF_CloseFile(fd1))!= PFE_OK){
+		PF_PrintError("close file");
+		exit(1);
+	}
+}
 
 readfile(fname)
 char *fname;
