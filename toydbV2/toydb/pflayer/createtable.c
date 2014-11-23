@@ -55,8 +55,7 @@ int pagenum,*buf;
 int *buf1,*buf2;
 int fd1,fd2;
 
-    printf("1: Create table 2: select from table 3: join two tables\n");
-    int choice;
+   int choice;
     scanf("%d", &choice);
 
 	char filename1[20], filename2[20];
@@ -64,34 +63,28 @@ int fd1,fd2;
     switch(choice)
     {
     case 1:
-		printf("Enter file name\n");
-    	scanf("%s", filename1);
+		scanf("%s", filename1);
 
         if ((error=PF_CreateFile(filename1))!= PFE_OK){
             PF_PrintError("asfsad");
             exit(1);
         }
 
-        printf("Enter number of pages\n");
         scanf("%d", &choice);
         writefile(filename1, choice);
 
         break;
 
     case 2:
-		printf("Enter file name\n");
-    	scanf("%s", filename1);
+		scanf("%s", filename1);
 
         selectByName(filename1, "DBInternals");
 
         break;
 
     case 3:
-		printf("Enter first file\n");
-    	scanf("%s", filename1);
-
-		printf("Enter second file\n");
-    	scanf("%s", filename2);
+		scanf("%s", filename1);
+		scanf("%s", filename2);
 
 		join(filename1, filename2);
 
@@ -134,7 +127,7 @@ writefile(char *fname, int n_pages)
 		PF_PrintError("open file1");
 		exit(1);
 	}
-	printf("opened %s\n",fname);
+	//printf("opened %s\n",fname);
 
 	for (i=0; i < n_pages; i++){
 		if ((error=PF_AllocPage(fd,&pagenum,&buf))!= PFE_OK){
@@ -148,7 +141,7 @@ writefile(char *fname, int n_pages)
         }
 
 
-		printf("allocated page %d\n",pagenum);
+		//printf("allocated page %d\n",pagenum);
 		if ((error=PF_UnfixPage(fd,i,TRUE))!= PFE_OK){
 			PF_PrintError("unfix buffer\n");
 			exit(1);
@@ -179,7 +172,7 @@ selectByName(char* fname, char* name)
 
 
 
-    printf("opening %s\n",fname);
+    //printf("opening %s\n",fname);
 	if ((fd=PF_OpenFile(fname))<0){
 		PF_PrintError("open file");
 		exit(1);
@@ -216,17 +209,17 @@ selectByName(char* fname, char* name)
 
 join(char *f1, char *f2) {
     int page_hdr1 = 4, page_hdr2 = 4;
-    
+
 	int fd1, pagenum1, *buf1, error1, fd2, pagenum2, *buf2, error2;
 
-	printf("opening %s\n", f1);
+	//printf("opening %s\n", f1);
 
     if ((fd1=PF_OpenFile(f1))<0){
 		PF_PrintError("open file");
 		exit(1);
 	}
 
-	printf("opening %s\n", f2);
+	//printf("opening %s\n", f2);
 
 	if ((fd2=PF_OpenFile(f2))<0) {
 		PF_PrintError("open file");
@@ -239,13 +232,9 @@ join(char *f1, char *f2) {
 		pagenum2 = -1;
 
 		while ((error2=PF_GetNextPage(fd2,&pagenum2,&buf2))== PFE_OK) {
-			printf("%d\n", pagenum2);
-
 			struct Record r1;
 			struct Record r2;
 			int n_tuppp1 = buf1[0], n_tuppp2 = buf2[0], i1 = 0, i2 = 0;
-
-			printf("a\n");
 
 			for(; i1 < n_tuppp1; ++ i1) {
 				i2 = 0;
@@ -258,17 +247,11 @@ join(char *f1, char *f2) {
 				}
 			}
 
-			printf("b\n");
-
 			if ((error2=PF_UnfixPage(fd2,pagenum2,FALSE))!= PFE_OK) {
 				PF_PrintError("unfix");
 				exit(1);
 			}
-
-			printf("c\n");
 		}
-
-		printf("e\n");
 
 		if ((error1=PF_UnfixPage(fd1,pagenum1,FALSE))!= PFE_OK) {
 			PF_PrintError("unfix");
@@ -295,7 +278,7 @@ int *buf;
 int pagenum;
 int fd;
 
-	printf("opening %s\n",fname);
+	//printf("opening %s\n",fname);
 	if ((fd=PF_OpenFile(fname))<0){
 		PF_PrintError("open file");
 		exit(1);
@@ -314,10 +297,10 @@ int error;
 int *buf;
 int pagenum;
 
-	printf("reading file\n");
+	//printf("reading file\n");
 	pagenum = -1;
 	while ((error=PF_GetNextPage(fd,&pagenum,&buf))== PFE_OK){
-		printf("got page %d, %d\n",pagenum,*buf);
+		//printf("got page %d, %d\n",pagenum,*buf);
 		if ((error=PF_UnfixPage(fd,pagenum,FALSE))!= PFE_OK){
 			PF_PrintError("unfix");
 			exit(1);
@@ -327,7 +310,7 @@ int pagenum;
 		PF_PrintError("not eof\n");
 		exit(1);
 	}
-	printf("eof reached\n");
+	//printf("eof reached\n");
 
 }
 

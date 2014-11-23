@@ -1,6 +1,8 @@
 /* pf.h: externs and error codes for Paged File Interface*/
+#ifndef _PFH_
+#define _PFH_
 #ifndef TRUE
-#define TRUE 1		
+#define TRUE 1
 #endif
 #ifndef FALSE
 #define FALSE 0
@@ -36,6 +38,9 @@
 
 /* externs from the PF layer */
 extern int PFerrno;		/* error number of last error */
+extern int PFbufCacheMiss;
+extern int PFbufCacheHit;
+
 extern void PF_Init();
 extern void PF_PrintError();
 extern void PF_printcounts();
@@ -61,3 +66,4 @@ int PF_UnfixPage(int fd, int pagenum, int dirty);
 void PF_PrintError(char *s);
 
 void setBufMode(int n);
+#endif

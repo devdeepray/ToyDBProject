@@ -54,7 +54,7 @@ PFhash_entry *entry; /* ptr to entries to search */
 	bucket = PFhash(fd,page);
 
 	/* go through the linked list of this bucket */
-	for (entry=PFhashtbl[bucket]; entry != NULL; 
+	for (entry=PFhashtbl[bucket]; entry != NULL;
 				entry = entry->nextentry){
 		if (entry->fd == fd && entry->page == page )
 			/* found it */
@@ -72,7 +72,7 @@ PFbpage *bpage;	/* buffer address for this page */
 /*****************************************************************************
 SPECIFICATIONS:
 	Insert the file descriptor "fd", page number "page", and the
-	buffer address "bpage" into the hash table. 
+	buffer address "bpage" into the hash table.
 
 AUTHOR: clc
 
@@ -80,7 +80,7 @@ RETURN VALUE:
 	PFE_OK	if OK
 	PFE_NOMEM	if nomem
 	PFE_HASHPAGEEXIST if the page already exists.
-	
+
 GLOBAL VARIABLES MODIFIED:
 	PFhashtbl
 *****************************************************************************/
@@ -97,7 +97,7 @@ PFhash_entry *entry; /* pointer to new entry */
 
 	/* find the bucket for this page */
 	bucket = PFhash(fd,page);
-	
+
 	/* allocate mem for new entry */
 	if ((entry=(PFhash_entry *)malloc(sizeof(PFhash_entry)))== NULL){
 		/* no mem */
@@ -176,18 +176,18 @@ AUTHOR: clc
 RETURN VALUE: None
 *****************************************************************************/
 {
-int i;
-PFhash_entry *entry;
-
-	for (i=0; i < PF_HASH_TBL_SIZE; i++){
-		printf("bucket %d\n",i);
-		if (PFhashtbl[i] == NULL)
-			printf("\tempty\n");
-		else{
-			for (entry = PFhashtbl[i]; entry != NULL;
-					entry = entry->nextentry)
-				printf("\tfd: %d, page: %d %d\n",
-					entry->fd, entry->page,entry->bpage);
-		}
-	}
+//int i;
+//PFhash_entry *entry;
+//
+//	for (i=0; i < PF_HASH_TBL_SIZE; i++){
+//		printf("bucket %d\n",i);
+//		if (PFhashtbl[i] == NULL)
+//			printf("\tempty\n");
+//		else{
+//			for (entry = PFhashtbl[i]; entry != NULL;
+//					entry = entry->nextentry)
+//				printf("\tfd: %d, page: %d %d\n",
+//					entry->fd, entry->page,entry->bpage);
+//		}
+//	}
 }
