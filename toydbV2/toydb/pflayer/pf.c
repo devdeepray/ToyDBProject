@@ -11,9 +11,6 @@
 #define L_SET 0
 #endif
 
-int PFdiskreadcount = 0;
-int PFdiskwritecount = 0;
-
 int PFerrno = PFE_OK;	/* last error message */
 int PFbufCacheMiss = 0;
 int PFbufCacheHit = 0;
@@ -111,7 +108,6 @@ RETURN VALUE:
 *****************************************************************************/
 {
 int error;
-	PFdiskreadcount++;
 	/* seek to the appropriate place */
 	if ((error=lseek(PFftab[fd].unixfd,pagenum*sizeof(PFfpage)+PF_HDR_SIZE,
 				L_SET)) == -1){
@@ -149,7 +145,6 @@ RETURN VALUE:
 *****************************************************************************/
 {
 int error;
-PFdiskwritecount++;
 	/* seek to the right place */
 	if ((error=lseek(PFftab[fd].unixfd,pagenum*sizeof(PFfpage)+PF_HDR_SIZE,
 				L_SET)) == -1){
@@ -759,5 +754,5 @@ RETURN VALUE: none
 }
 void PF_printcounts()
 {
-	printf("%d,%d,%d,%d\n", PFdiskreadcount, PFdiskwritecount, PFbufCacheHit, PFbufCacheMiss);
+	printf("%d,%d\n", PFbufCacheHit, PFbufCacheMiss);
 }
