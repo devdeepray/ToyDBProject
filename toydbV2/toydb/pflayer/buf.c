@@ -104,7 +104,7 @@ GLOBAL VARIABLES MODIFIED:
 static PFbufgetvictimMRU()
 {
 	PFbpage* tbpage = NULL;
-	for (tbpage=PFlastbpage;tbpage!=NULL;tbpage=tbpage->prevpage){
+	for (tbpage=PFfirstbpage;tbpage!=NULL;tbpage=tbpage->nextpage){
 		if (!tbpage->fixed)
 		/* found a page that can be swapped out */
 		break;
@@ -115,7 +115,7 @@ static PFbufgetvictimMRU()
 static PFbufgetvictimLRU()
 {
 	PFbpage* tbpage = NULL;
-	for (tbpage=PFfirstbpage;tbpage!=NULL;tbpage=tbpage->nextpage){
+	for (tbpage=PFlastbpage;tbpage!=NULL;tbpage=tbpage->prevpage){
 		if (!tbpage->fixed)
 		/* found a page that can be swapped out */
 		break;
