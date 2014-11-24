@@ -66,4 +66,6 @@ int PF_UnfixPage(int fd, int pagenum, int dirty);
 void PF_PrintError(char *s);
 
 void setBufMode(int n);
+
+void setBufSize(int size);
 #endif

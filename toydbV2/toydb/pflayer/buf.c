@@ -20,7 +20,12 @@ PFsetbufmode(int modeval)
 	PFbufmode = modeval;
 }
 
+static int PF_MAX_BUFS = 10;
 
+PFsetbufsize(int size)
+{
+	PF_MAX_BUFS = size;
+}
 
 static void PFbufInsertFree(bpage)
 PFbpage *bpage;

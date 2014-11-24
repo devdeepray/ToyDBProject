@@ -173,6 +173,11 @@ void setBufMode(int val)
 	PFsetbufmode(val);
 }
 
+void setBufSize(int size)
+{
+	PFsetbufsize(size);
+}
+
 void PF_Init()
 /****************************************************************************
 SPECIFICATIONS:

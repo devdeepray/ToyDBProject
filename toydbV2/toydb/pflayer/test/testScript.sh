@@ -34,3 +34,11 @@ done
 #        echo $i" 3 f1_"$j" f2_"$j | ../createtable 2>/dev/null 1>>"join_"$i".stats";
 #    done
 #done
+
+for i in {0..3}
+do
+    for j in {2..20}
+    do
+	echo $i" 4 f1_10 f2_15 "$j | ../createtable 2>/dev/null 1>>"buf_"$i".stats";
+    done
+done

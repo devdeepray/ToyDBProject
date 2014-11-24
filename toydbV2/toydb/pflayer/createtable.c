@@ -90,8 +90,19 @@ int fd1,fd2;
 
         break;
 
+    case 4:
+		scanf("%s", filename1);
+		scanf("%s", filename2);
+
+		scanf("%d", &choice);
+		setBufSize(choice);
+
+		join(filename1, filename2);
+
+		break;
+
     default:
-        break;
+        	break;
     }
 
 PF_printcounts();
